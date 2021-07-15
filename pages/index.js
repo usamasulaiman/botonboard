@@ -1,33 +1,55 @@
 import React from "react";
-import Head from "next/head";
 import Image from "next/image";
-import styles from "../styles/Home.module.css";
 import Welcome from "../components/Welcome";
 import Onboarding from "../components/Onboarding";
-import { Flex } from "@chakra-ui/react";
+import { get } from "lodash-es";
 
-export default function Home() {
+import { Flex, Container, Spacer, Box } from "@chakra-ui/react";
+import { Client } from "@notionhq/client";
+
+export default function Home({ notionFunctions }) {
   const [shouldOnboard, udpateOnboardingStatus] = React.useState(false);
   const updateEmailStatus = (flag) => {
     udpateOnboardingStatus(flag);
   };
 
+  const filteredFunctionalTeams = () =>
+    notionFunctions.filter(
+      (item) => get(item, ["properties", "function", "rich_text"]).length
+    );
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Bot-board</title>
-        <meta name="description" content="Just a bot helping you onboard" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <Flex>
+    <Container
+      animate
+      w="100vw"
+      maxW="1400px"
+      style={{ minHeight: "100vh" }}
+      centerContent
+      className="homepage"
+    >
+      <Flex
+        w="100%"
+        h="100%"
+        flex="1"
+        alignItems={shouldOnboard ? '' : 'center'}
+        justifyContent={!shouldOnboard ? '' : 'center'}
+        className="main"
+        marginTop="150px"
+        marginBottom="4"
+      >
+        <Box maxW={shouldOnboard ? '400px' : '600px'} justifyContent="center" style={{display: "flex", alignItems: "center"}}>
           <Welcome updateEmailStatus={updateEmailStatus} />
-          {shouldOnboard && <Onboarding />}
-        </Flex>
-      </main>
-
-      <footer className={styles.footer}>
+        </Box>
+        {shouldOnboard && (
+          <Box flex="1">
+            <Onboarding
+              style={{ flex: 1 }}
+              functions={filteredFunctionalTeams()}
+            />
+          </Box>
+        )}
+      </Flex>
+      <footer className="footer">
         <a
           href="https://noonacademy.com"
           target="_blank"
@@ -36,6 +58,19 @@ export default function Home() {
           noonacademy.com
         </a>
       </footer>
-    </div>
+    </Container>
   );
+}
+
+export async function getStaticProps() {
+  const notion = new Client({ auth: process.env.NOTION_API_KEY });
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_FUNCTION_DB,
+  });
+
+  return {
+    props: {
+      notionFunctions: response.results,
+    },
+  };
 }

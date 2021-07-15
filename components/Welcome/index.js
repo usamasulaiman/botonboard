@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Input, FormControl, Text, Button, Spinner, InputRightElement, InputGroup, useToast } from "@chakra-ui/react"
+import { Container, Input, FormControl, Text, Button, Spinner, InputRightElement, InputGroup, useToast } from "@chakra-ui/react"
 
 function Welcome(props) {
   const { updateEmailStatus } = props;
@@ -50,18 +50,18 @@ function Welcome(props) {
   }
 
   return (
-    <div>
+    <Container>
       <Text
         bgGradient="linear(to-l, #7928CA,#FF0080)"
         bgClip="text"
-        fontSize="6xl"
+        fontSize={verifiedEmail ? '4xl' : '6xl'}
         fontWeight="extrabold"
       >
         Welcome {verifiedEmail ? `${verifiedEmail.split('@')[0].replace('.', ' ')}` : 'to Hibiki'}
       </Text>
       <Text
         mb={10}
-        fontSize="2xl"
+        fontSize="3xl"
         fontWeight="normal"
       >
         {verifiedEmail ? 'Let\'s get you setup!' : 'The bot that will help you onboard. Enter your email to get started'}
@@ -88,12 +88,12 @@ function Welcome(props) {
           </FormControl>
         </form>
       )}
-    </div>
+    </Container>
   )
 }
 
 Welcome.propTypes = {
-  emailVerified: PropTypes.func.isRequired,
+  updateEmailStatus: PropTypes.func.isRequired,
 }
 
 export default Welcome
