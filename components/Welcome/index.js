@@ -6,8 +6,8 @@ function Welcome(props) {
   const { updateEmailStatus } = props;
   const toast = useToast();
 
-  const [email, udpateEmail] = React.useState("")
-  const [verifiedEmail, udpateVerifiedEmail] = React.useState("")
+  const [email, updateEmail] = React.useState("")
+  const [verifiedUser, updateVerifiedUser] = React.useState({})
   const [submitting, setSubmitting] = React.useState(false)
   const [formError, updateFormError] = React.useState(false)
 
@@ -15,12 +15,12 @@ function Welcome(props) {
 
   const handleChange = (event) => {
     if (formError) updateFormError(false)
-    udpateEmail(event.target.value)
+    updateEmail(event.target.value)
   }
 
   React.useEffect(() => {
-    if (localStorage.email) {
-      udpateVerifiedEmail(localStorage.getItem('email'))
+    if (localStorage.user) {
+      updateVerifiedUser(JSON.parse(localStorage.getItem('user') || '{}'))
       updateEmailStatus(true);
     }
   }, [])
@@ -30,8 +30,8 @@ function Welcome(props) {
     if (!EMAIL_PATTERN.test(email)) updateFormError(true)
     else {
       if (email.includes('noonacademy.com') || email.includes('non.sa')) {
-        localStorage.setItem('email', email)
-        udpateVerifiedEmail(email)
+        localStorage.setItem('user', JSON.stringify({email}))
+        updateVerifiedUser({email})
         updateEmailStatus(true);
       }
       else {
@@ -54,19 +54,19 @@ function Welcome(props) {
       <Text
         bgGradient="linear(to-l, #7928CA,#FF0080)"
         bgClip="text"
-        fontSize={verifiedEmail ? '4xl' : '6xl'}
+        fontSize={verifiedUser && verifiedUser.email ? '4xl' : '6xl'}
         fontWeight="extrabold"
       >
-        Welcome {verifiedEmail ? `${verifiedEmail.split('@')[0].replace('.', ' ')}` : 'to Hibiki'}
+        Welcome {verifiedUser && verifiedUser.email ? `${verifiedUser.email.split('@')[0].replace('.', ' ')}` : 'to Hibiki'}
       </Text>
       <Text
         mb={10}
         fontSize="3xl"
         fontWeight="normal"
       >
-        {verifiedEmail ? 'Let\'s get you setup!' : 'The bot that will help you onboard. Enter your email to get started'}
+        {verifiedUser ? 'Let\'s get you setup!' : 'The bot that will help you onboard. Enter your email to get started'}
       </Text>
-      {!verifiedEmail && (
+      {!verifiedUser || !verifiedUser.email && (
         <form onSubmit={checkEmail}>
           <FormControl id="email">
             
