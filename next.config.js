@@ -5,7 +5,4 @@ module.exports = withTM({
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
-  env: {
-    NOTION_KEY: 'secret_eDkBiNSSFvL5DGpsap0PTuFsFHbIuTVVUvW6ZNefBbc',
-  },
 });
