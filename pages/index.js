@@ -37,10 +37,11 @@ export default function Home({ notionFunctions, notionProductTeams, notionUsers 
         alignItems={shouldOnboard ? '' : 'center'}
         justifyContent={!shouldOnboard ? '' : 'center'}
         className="main"
-        marginTop="150px"
+        marginTop="100px"
         marginBottom="4"
       >
-        <Box maxW={shouldOnboard ? '400px' : '600px'} justifyContent="center" style={{display: "flex", alignItems: "center"}}>
+        {/* , alignItems: "center" */}
+        <Box maxW={shouldOnboard ? '450px' : '600px'} justifyContent="center" style={{display: "flex"}}>
           <Welcome updateEmailStatus={updateEmailStatus} notionProductTeams={notionProductTeams} notionUsers={notionUsers} />
         </Box>
         {shouldOnboard && (

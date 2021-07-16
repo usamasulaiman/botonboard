@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import find from 'lodash-es/find'
+import { find, get } from 'lodash-es'
 import { getInfoFromNotionDBList } from '../../utils/notionHelpers';
 import { Box, Text, Input, InputGroup, FormControl, InputRightElement, Button, Spinner, useToast } from '@chakra-ui/react';
 
@@ -15,12 +15,20 @@ function Authentication(props) {
 
   const usersList = React.useRef(getInfoFromNotionDBList(notionUsers, ['properties', 'email', 'email']))
 
-  const formulateUser = (email) => {
+  const formulateUser = (passedEmail) => {
     const allUserProperties = getInfoFromNotionDBList(notionUsers, ['properties'])
-    let userObj;
+    let selectedPropertyObj;
     allUserProperties.forEach(property => {
-      userObj = find(allUserProperties, [email, get(property, ['emial', 'email'])])
+      if (get(property, ['email', 'email']) === passedEmail) selectedPropertyObj = property
     })
+    // console.log('property', selectedPropertyObj)
+    const { email: { email }, name: { rich_text }, team: { select: { name: teamName } }, function: { select: { name: functionName } } } = selectedPropertyObj;
+    const userObj = {
+      email,
+      name: get(rich_text, [`${[0]}`, 'plain_text']) || '',
+      teamName,
+      functionName
+    }
     return userObj;
   }
 
@@ -34,12 +42,11 @@ function Authentication(props) {
     if (!EMAIL_PATTERN.test(email)) updateFormError(true)
     else {
       if (email.includes('noonacademy.com') || email.includes('non.sa')) {
-        console.log('user list', usersList)
         if (usersList.current.includes(email)) {
           const user = await formulateUser(email);
-          console.log('user received is', user);
-          localStorage.setItem('user', JSON.stringify({email}))
-          updateVerifiedUser({email})
+          // console.log('user received is', user);
+          localStorage.setItem('user', JSON.stringify(user))
+          updateVerifiedUser(user)
           updateEmailStatus(true);
         } else {
           updateEmailStatus(false);
@@ -76,11 +83,11 @@ function Authentication(props) {
         fontSize={verifiedUser && verifiedUser.email ? '4xl' : '6xl'}
         fontWeight="extrabold"
       >
-        Welcome {verifiedUser && verifiedUser.email ? `${verifiedUser.email.split('@')[0].replace('.', ' ')}` : 'to Hibiki'}
+        Welcome {verifiedUser && verifiedUser.email ? verifiedUser.name || `${verifiedUser.email.split('@')[0].replace('.', ' ')}` : 'to Hibiki'}
       </Text>
       <Text
         mb={10}
-        fontSize="3xl"
+        fontSize="2xl"
         fontWeight="normal"
       >
         {verifiedUser ? 'Let\'s get you setup!' : 'The bot that will help you onboard. Enter your email to get started'}
