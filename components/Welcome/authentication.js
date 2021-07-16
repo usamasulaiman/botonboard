@@ -1,32 +1,43 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import find from 'lodash-es/find'
 import { getInfoFromNotionDBList } from '../../utils/notionHelpers';
 import { Box, Text, Input, InputGroup, FormControl, InputRightElement, Button, Spinner, useToast } from '@chakra-ui/react';
 
 function Authentication(props) {
   const { verifiedUser, updateEmailStatus, updateVerifiedUser, notionProductTeams, notionUsers } = props;
+  const toast = useToast();
+  const EMAIL_PATTERN = /^(\s*[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9}\s*)$/;
+
   const [submitting, setSubmitting] = React.useState(false)
   const [formError, updateFormError] = React.useState(false)
   const [email, updateEmail] = React.useState("")
 
   const usersList = React.useRef(getInfoFromNotionDBList(notionUsers, ['properties', 'email', 'email']))
 
-  const toast = useToast();
-
-  const EMAIL_PATTERN = /^(\s*[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9}\s*)$/;
+  const formulateUser = (email) => {
+    const allUserProperties = getInfoFromNotionDBList(notionUsers, ['properties'])
+    let userObj;
+    allUserProperties.forEach(property => {
+      userObj = find(allUserProperties, [email, get(property, ['emial', 'email'])])
+    })
+    return userObj;
+  }
 
   const handleChange = (event) => {
     if (formError) updateFormError(false)
     updateEmail(event.target.value)
   }
   
-  const checkEmail = (e) => {
+  const checkEmail = async (e) => {
     e.preventDefault();
     if (!EMAIL_PATTERN.test(email)) updateFormError(true)
     else {
       if (email.includes('noonacademy.com') || email.includes('non.sa')) {
         console.log('user list', usersList)
         if (usersList.current.includes(email)) {
+          const user = await formulateUser(email);
+          console.log('user received is', user);
           localStorage.setItem('user', JSON.stringify({email}))
           updateVerifiedUser({email})
           updateEmailStatus(true);

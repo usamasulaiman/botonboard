@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import { Container, Input, FormControl, Text, Button, Spinner, InputRightElement, InputGroup, useToast } from "@chakra-ui/react"
 import Authentication from './authentication'
+import WelcomeMessage from './welcomeMessage'
 
 function Welcome(props) {
   const { updateEmailStatus, notionProductTeams, notionUsers } = props;
@@ -26,6 +27,7 @@ function Welcome(props) {
         notionProductTeams={notionProductTeams}
         notionUsers={notionUsers}
       />
+      <WelcomeMessage />
     </Container>
   )
 }
