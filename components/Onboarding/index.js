@@ -22,8 +22,8 @@ function Onboarding(props) {
 
   return (
     <VStack spacing="64px">
-      <TeamSelection functions={functions} updateUser={updateUser} verifiedUser={verifiedUser}/>
-      {/* <SlackOnboarding teamProperties={find(functions, ['functions', ])} verifiedUser={verifiedUser} /> */}
+      {/* <TeamSelection functions={functions} updateUser={updateUser} verifiedUser={verifiedUser}/> */}
+      <SlackOnboarding teamProperties={find(functions, ['functions', ])} verifiedUser={verifiedUser} />
     </VStack>
   );
 }

@@ -7,7 +7,10 @@ import { get } from "lodash-es";
 import { Flex, Container, Spacer, Box } from "@chakra-ui/react";
 import { Client } from "@notionhq/client";
 
-export default function Home({ notionFunctions }) {
+export default function Home({ notionFunctions, notionProductTeams, notionUsers }) {
+
+  console.log('teams and users', notionProductTeams, notionUsers)
+
   const [shouldOnboard, udpateOnboardingStatus] = React.useState(false);
   const updateEmailStatus = (flag) => {
     udpateOnboardingStatus(flag);
@@ -38,7 +41,7 @@ export default function Home({ notionFunctions }) {
         marginBottom="4"
       >
         <Box maxW={shouldOnboard ? '400px' : '600px'} justifyContent="center" style={{display: "flex", alignItems: "center"}}>
-          <Welcome updateEmailStatus={updateEmailStatus} />
+          <Welcome updateEmailStatus={updateEmailStatus} notionProductTeams={notionProductTeams} notionUsers={notionUsers} />
         </Box>
         {shouldOnboard && (
           <Box flex="1">
@@ -64,13 +67,21 @@ export default function Home({ notionFunctions }) {
 
 export async function getStaticProps() {
   const notion = new Client({ auth: process.env.NOTION_API_KEY });
-  const response = await notion.databases.query({
+  const notionFunctions = await notion.databases.query({
     database_id: process.env.NOTION_FUNCTION_DB,
+  });
+  const notionUsers = await notion.databases.query({
+    database_id: process.env.NOTION_USER_DB,
+  });
+  const notionProductTeams = await notion.databases.query({
+    database_id: process.env.NOTION_TEAM_DB,
   });
 
   return {
     props: {
-      notionFunctions: response.results,
+      notionFunctions: notionFunctions.results,
+      notionProductTeams: notionProductTeams.results,
+      notionUsers: notionUsers.results
     },
   };
 }
